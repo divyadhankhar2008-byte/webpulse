@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="WebPulse — Real-time web intelligence powered by Wire (Anakin). Pull structured data from any website via a single API call."/>
+  <title>WebPulse — Real-Time Web Intelligence via Wire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+/* ═══════════════════════════════════════════
+   WebPulse · Professional Stylesheet
+   Theme: Deep Navy · Playfair Display + Mulish
+   ═══════════════════════════════════════════ */
+
+:root {
+  --navy:        #0b1120;
+  --navy-mid:    #111827;
+  --navy-light:  #1a2540;
+  --navy-border: #253150;
+  --slate:       #8a96b0;
+  --slate-light: #c4cde0;
+  --white:       #eef1f8;
+  --gold:        #c9a84c;
+  --gold-light:  #e8c97a;
+  --gold-faint:  rgba(201,168,76,0.10);
+  --teal:        #2dd4bf;
+  --teal-faint:  rgba(45,212,191,0.08);
+  --red:         #f06b6b;
+  --green:       #4ade80;
+
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+
+  --shadow-card: 0 2px 16px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-deep: 0 8px 40px rgba(0,0,0,0.5);
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Mulish', sans-serif;
+
+  --sidebar-w: 220px;
+  --topbar-h:  60px;
+}
+
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(ellipse 80% 60% at 70% 10%, rgba(201,168,76,0.04) 0%, transparent 60%),
+                    radial-gradient(ellipse 60% 40% at 10% 80%, rgba(45,212,191,0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════ */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--navy-mid);
+  border-right: 1px solid var(--navy-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 20px;
+  border-bottom: 1px solid var(--navy-border);
+}
+
+.logo-mark {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--navy);
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(201,168,76,0.3);
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--white);
+  letter-spacing: 0.3px;
+}
+
+.logo-sub {
+  font-size: 10px;
+  color: var(--slate);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+/* NAV */
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 12px;
+  overflow-y: auto;
+}
+
+.nav-label {
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  color: var(--slate);
+  padding: 0 8px;
+  margin: 8px 0 6px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--slate-light);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.18s;
+  user-select: none;
+  margin-bottom: 2px;
+}
+
+.nav-item:hover {
+  background: var(--navy-light);
+  color: var(--white);
+}
+
+.nav-item.active {
+  background: var(--gold-faint);
+  color: var(--gold-light);
+  border: 1px solid rgba(201,168,76,0.2);
+}
+
+.nav-icon {
+  width: 18px;
+  text-align: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* SIDEBAR FOOTER */
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--navy-border);
+}
+
+.wire-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--teal);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.wire-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 8px var(--teal);
+  animation: pulse 2.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.sidebar-version {
+  font-size: 10px;
+  color: var(--slate);
+  letter-spacing: 0.3px;
+}
+
+/* ═══════════════════════════════════════
+   MAIN WRAPPER
+   ═══════════════════════════════════════ */
+.main-wrapper {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--topbar-h);
+  background: rgba(11,17,32,0.92);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--navy-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+}
+
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+
+.menu-btn {
+  background: none;
+  border: none;
+  color: var(--slate);
+  font-size: 18px;
+  cursor: pointer;
+  display: none;
+  padding: 4px;
+  line-height: 1;
+}
+
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.bc-root { color: var(--slate); }
+.bc-sep { color: var(--navy-border); }
+.bc-current { color: var(--white); font-weight: 600; }
+
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+
+.stat-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--navy-light);
+  border: 1px solid var(--navy-border);
+  font-size: 12px;
+  color: var(--slate-light);
+  font-weight: 500;
+}
+
+.stat-pill span { color: var(--white); font-weight: 700; }
+
+.accent-pill {
+  background: var(--gold-faint);
+  border-color: rgba(201,168,76,0.3);
+  color: var(--gold-light);
+}
+.accent-pill span { color: var(--gold-light); }
+
+/* ─── HERO SECTION ─── */
+.hero-section {
+  padding: 36px 28px 28px;
+  border-bottom: 1px solid var(--navy-border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  margin-bottom: 10px;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--gold-light);
+}
+
+.hero-desc {
+  font-size: 13.5px;
+  color: var(--slate);
+  max-width: 500px;
+  line-height: 1.75;
+}
+
+.hero-desc strong { color: var(--gold-light); font-weight: 600; }
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--navy-light);
+  border: 1px solid var(--navy-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.hstat {
+  padding: 16px 24px;
+  text-align: center;
+}
+
+.hstat-val {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+
+.hstat-label {
+  font-size: 10.5px;
+  color: var(--slate);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.hstat-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--navy-border);
+  align-self: center;
+}
+
+/* ─── FETCH PANEL ─── */
+.fetch-panel {
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--navy-border);
+  background: rgba(26,37,64,0.3);
+}
+
+.fetch-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.input-group { display: flex; flex-direction: column; gap: 5px; }
+.input-group.flex-1 { flex: 1; min-width: 220px; }
+.input-group.btn-group { flex-shrink: 0; }
+
+.input-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+.styled-select,
+.styled-input {
+  background: var(--navy-mid);
+  border: 1px solid var(--navy-border);
+  border-radius: var(--radius-sm);
+  color: var(--white);
+  padding: 9px 13px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.styled-select {
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a96b0'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+  min-width: 190px;
+}
+
+.styled-select:focus,
+.styled-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+}
+
+.styled-input::placeholder { color: var(--slate); }
+
+.btn-fetch {
+  background: linear-gradient(135deg, var(--gold), #b8862e);
+  color: var(--navy);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 9px 20px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  box-shadow: 0 2px 12px rgba(201,168,76,0.3);
+}
+
+.btn-fetch:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(201,168,76,0.4); }
+.btn-fetch:active { transform: translateY(0); }
+.btn-fetch:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.btn-demo {
+  background: transparent;
+  color: var(--teal);
+  border: 1px solid rgba(45,212,191,0.35);
+  border-radius: var(--radius-sm);
+  padding: 9px 16px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-demo:hover {
+  background: var(--teal-faint);
+  border-color: var(--teal);
+}
+
+/* ─── DATA SECTION ─── */
+.data-section { padding: 24px 28px 48px; flex: 1; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.section-count {
+  font-size: 12px;
+  color: var(--slate);
+  background: var(--navy-light);
+  border: 1px solid var(--navy-border);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 600;
+}
+
+/* ─── CARD GRID ─── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* ─── DATA CARD ─── */
+.data-card {
+  background: var(--navy-mid);
+  border: 1px solid var(--navy-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+  animation: fadeSlideUp 0.4s ease both;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.data-card:hover {
+  border-color: rgba(201,168,76,0.3);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-deep), 0 0 0 1px rgba(201,168,76,0.1);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--navy-border);
+}
+
+.card-platform {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.platform-icon {
+  width: 30px; height: 30px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.platform-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--white);
+}
+
+.platform-handle {
+  font-size: 11px;
+  color: var(--slate);
+  margin-top: 1px;
+}
+
+.card-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--green);
+  background: rgba(74,222,128,0.08);
+  border: 1px solid rgba(74,222,128,0.2);
+  border-radius: 4px;
+  padding: 3px 8px;
+}
+
+.status-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.card-body { padding: 14px 18px; }
+
+/* FIELD ROWS */
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 6.5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 12.5px;
+}
+.field-row:last-of-type { border-bottom: none; }
+
+.field-label { color: var(--slate); flex-shrink: 0; }
+.field-val { color: var(--slate-light); text-align: right; max-width: 58%; word-break: break-word; }
+.field-val.highlight { color: var(--gold-light); font-weight: 600; }
+.field-val.teal { color: var(--teal); }
+.field-val.danger { color: var(--red); }
+
+/* SPARKLINE */
+.spark-container {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.spark-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--slate);
+  margin-bottom: 6px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.spark-label span:last-child { color: var(--gold-light); }
+
+canvas.sparkline { width: 100%; height: 44px; display: block; border-radius: 4px; }
+
+/* ─── WIRE LOG CARD ─── */
+.log-card {
+  grid-column: 1 / -1;
+  background: var(--navy-mid);
+  border: 1px solid var(--navy-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.log-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--navy-border);
+}
+
+.log-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.log-body {
+  padding: 14px 20px;
+  background: #070d1a;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  max-height: 340px;
+  overflow-y: auto;
+  line-height: 1.9;
+}
+.log-body::-webkit-scrollbar { width: 4px; }
+.log-body::-webkit-scrollbar-thumb { background: var(--navy-border); border-radius: 2px; }
+
+.log-entry { display: flex; gap: 14px; }
+.log-ts { color: #334; flex-shrink: 0; }
+.log-tag { flex-shrink: 0; width: 64px; font-weight: 700; }
+.log-msg { color: #6b7a99; }
+.log-entry.success .log-tag { color: var(--green); }
+.log-entry.error   .log-tag { color: var(--red); }
+.log-entry.pending .log-tag { color: #f0c040; }
+.log-entry.info    .log-tag { color: var(--teal); }
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 80px 20px;
+  text-align: center;
+  color: var(--slate);
+}
+
+.empty-icon {
+  font-size: 2.8rem;
+  opacity: 0.2;
+  color: var(--gold);
+}
+
+.empty-state h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--slate-light);
+  opacity: 0.7;
+}
+
+.empty-state p {
+  font-size: 13px;
+  line-height: 1.75;
+  max-width: 400px;
+}
+
+.empty-state strong { color: var(--gold-light); }
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  background: var(--navy-light);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--white);
+  box-shadow: var(--shadow-deep);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  max-width: 340px;
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+
+.toast-icon {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ─── LOADING OVERLAY ─── */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11,17,32,0.75);
+  backdrop-filter: blur(6px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-box {
+  background: var(--navy-mid);
+  border: 1px solid var(--navy-border);
+  border-radius: var(--radius-lg);
+  padding: 36px 48px;
+  text-align: center;
+  box-shadow: var(--shadow-deep);
+}
+
+.loading-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--navy-border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--slate-light);
+}
+
+/* ─── TAG VARIANTS ─── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.tag-teal    { background: rgba(45,212,191,0.1);  color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+.tag-gold    { background: var(--gold-faint);      color: var(--gold-light); border: 1px solid rgba(201,168,76,0.25); }
+.tag-red     { background: rgba(240,107,107,0.1);  color: var(--red);  border: 1px solid rgba(240,107,107,0.2); }
+
+/* ─── SCROLLBAR (global) ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--navy-border); border-radius: 3px; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(-220px); }
+  .sidebar.open { transform: translateX(0); width: 220px; }
+  .menu-btn { display: block; }
+  .main-wrapper { margin-left: 0; }
+  .hero-section { flex-direction: column; align-items: flex-start; }
+  .hero-stats { width: 100%; }
+  .hstat { flex: 1; }
+  .fetch-row { flex-direction: column; }
+  .input-group.btn-group { width: 100%; }
+  .btn-fetch, .btn-demo { width: 100%; }
+  .topbar-right { display: none; }
+}
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">W</div>
+      <div>
+        <div class="logo-text">WebPulse</div>
+        <div class="logo-sub">by Wire · Anakin</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">WORKSPACE</div>
+      <a class="nav-item active" onclick="switchTab('all', this)"><span class="nav-icon">⊞</span> Dashboard</a>
+      <a class="nav-item" onclick="switchTab('social', this)"><span class="nav-icon">◎</span> Social Intel</a>
+      <a class="nav-item" onclick="switchTab('market', this)"><span class="nav-icon">◈</span> Market Data</a>
+      <a class="nav-item" onclick="switchTab('tech', this)"><span class="nav-icon">⌥</span> Tech Sources</a>
+      <a class="nav-item" onclick="switchTab('log', this)"><span class="nav-icon">≡</span> Wire Log</a>
+      <div class="nav-label" style="margin-top:24px">ACTIONS</div>
+      <a class="nav-item" onclick="runDemo()"><span class="nav-icon">⚡</span> Run Demo</a>
+      <a class="nav-item" onclick="exportData()"><span class="nav-icon">↓</span> Export JSON</a>
+      <a class="nav-item" onclick="clearAll()"><span class="nav-icon">⊘</span> Clear All</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="wire-badge"><div class="wire-dot"></div>Wire Connected</div>
+      <div class="sidebar-version">v1.0.0 · Anakin Build-a-thon 2026</div>
+    </div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="breadcrumb">
+          <span class="bc-root">WebPulse</span>
+          <span class="bc-sep">›</span>
+          <span class="bc-current" id="bcCurrent">Dashboard</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="stat-pill"><span id="hStatSuccess">0</span> succeeded</div>
+        <div class="stat-pill"><span id="hStatTotal">0</span> total calls</div>
+        <div class="stat-pill accent-pill"><span id="hStatSources">0</span> sources</div>
+      </div>
+    </header>
+
+    <section class="hero-section">
+      <div class="hero-text">
+        <h1 class="hero-title">Real-Time Web Intelligence,<br><em>Zero Infrastructure</em></h1>
+        <p class="hero-desc">WebPulse uses <strong>Wire</strong> — Anakin's pre-built action layer — to pull clean, structured JSON from any website via a single API call. No scrapers. No selectors. No maintenance.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><div class="hstat-val" id="hsv1">0</div><div class="hstat-label">API Calls Made</div></div>
+        <div class="hstat-divider"></div>
+        <div class="hstat"><div class="hstat-val">8</div><div class="hstat-label">Platforms Supported</div></div>
+        <div class="hstat-divider"></div>
+        <div class="hstat"><div class="hstat-val">~1s</div><div class="hstat-label">Avg Response Time</div></div>
+      </div>
+    </section>
+
+    <section class="fetch-panel">
+      <div class="fetch-row">
+        <div class="input-group">
+          <label class="input-label">Data Source</label>
+          <select class="styled-select" id="sourceType">
+            <option value="twitter">Twitter / X Profile</option>
+            <option value="github">GitHub Profile</option>
+            <option value="linkedin">LinkedIn Profile</option>
+            <option value="amazon">Amazon Product</option>
+            <option value="reddit">Reddit Community</option>
+            <option value="hacker_news">Hacker News</option>
+            <option value="producthunt">Product Hunt</option>
+            <option value="youtube">YouTube Channel</option>
+          </select>
+        </div>
+        <div class="input-group flex-1">
+          <label class="input-label">Target (username, URL, or keyword)</label>
+          <input class="styled-input" id="targetInput" placeholder="e.g. anakin-ai, elonmusk, Node.js cookbook…" onkeydown="if(event.key==='Enter') fetchWireData()"/>
+        </div>
+        <div class="input-group btn-group">
+          <label class="input-label">&nbsp;</label>
+          <button class="btn-fetch" id="fetchBtn" onclick="fetchWireData()"><span id="fetchIcon">▶</span> Fetch via Wire</button>
+        </div>
+        <div class="input-group btn-group">
+          <label class="input-label">&nbsp;</label>
+          <button class="btn-demo" onclick="runDemo()">⚡ Demo</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="data-section">
+      <div class="section-header">
+        <h2 class="section-title" id="sectionTitle">All Data</h2>
+        <div class="section-count" id="sectionCount">0 records</div>
+      </div>
+      <div class="card-grid" id="mainGrid">
+        <div class="empty-state">
+          <div class="empty-icon">⊞</div>
+          <h3>No data fetched yet</h3>
+          <p>Select a source, enter a target, and click <strong>Fetch via Wire</strong><br>— or hit <strong>⚡ Demo</strong> to see six live Wire calls fire automatically.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"><div class="toast-icon">✓</div><span id="toastMsg">Done</span></div>
+
+  <div class="loading-overlay" id="loadingOverlay" style="display:none">
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <div class="loading-text" id="loadingText">Initialising Wire…</div>
+    </div>
+  </div>
+
+  <script>
+/* ═══════════════════════════════════════════
+   WebPulse · data.js
+   Sample data pools & helpers for Wire engine
+   ═══════════════════════════════════════════ */
+
+const DATA = {
+  bios: [
+    'Building the future, one commit at a time 🚀',
+    'Founder @startup | ex-Google | coffee addict ☕',
+    'Indie hacker. 3× SaaS founder. Sharing what I learn.',
+    'Designer turned developer. Making beautiful things.',
+    'Open-source contributor. ML enthusiast. Cat dad.',
+  ],
+  headlines: [
+    'Senior Software Engineer @ Stripe',
+    'Co-Founder & CTO at an early-stage startup',
+    'Product Designer | Building tools at scale',
+    'ML Researcher | ex-DeepMind | Stanford PhD',
+    'Head of Engineering @ Series-B SaaS startup',
+  ],
+  taglines: [
+    'Turn any website into structured data in one API call.',
+    'The productivity layer your team never knew it needed.',
+    'AI-powered analytics for the modern growth team.',
+    'Build faster, ship more, sleep better.',
+    'Your data pipeline deserves better than copy-paste.',
+  ],
+  ytTitles: [
+    'I replaced my entire workflow with AI — here\'s what happened',
+    'Building a SaaS in 30 days: full honest breakdown',
+    'How I hit $10k MRR as a solo developer',
+    'The honest guide to passive income in 2026',
+    'Why I quit my FAANG job (it wasn\'t what you think)',
+  ],
+  hnStories: [
+    'Ask HN: What\'s your stack in 2026?',
+    'Show HN: I built a tool that turns any site into an API',
+    'Why REST still beats GraphQL for most teams',
+    'Ask HN: Who is hiring? (May 2026)',
+  ],
+  topPosts: [
+    'I quit my 9-5 after 6 months of building this side project',
+    'What developer tools are you paying for in 2026?',
+    'Just shipped my first SaaS — here\'s everything I learned',
+    'Unpopular opinion: over-engineering killed your startup',
+  ],
+  companies: ['Google', 'Meta', 'Stripe', 'OpenAI', 'Vercel', 'Anthropic', 'Y Combinator', 'Figma'],
+  universities: ['MIT', 'Stanford', 'IIT Delhi', 'ETH Zürich', 'Carnegie Mellon', 'UC Berkeley'],
+  languages: ['TypeScript', 'Rust', 'Python', 'Go', 'C++', 'Kotlin', 'Swift', 'Zig'],
+  skills: ['Python', 'Machine Learning', 'Product Management', 'System Design', 'Growth', 'UI/UX', 'Rust', 'DevOps'],
+  phCategories: ['AI', 'Developer Tools', 'Productivity', 'Design', 'Marketing', 'No-Code'],
+  sellers: ['Amazon.com', 'TechStore Direct', 'DigitalHub', 'MegaDeals Co.'],
+  departments: ['Electronics', 'Books', 'Software', 'Tools & Home', 'Office Products'],
+  countries: ['US', 'IN', 'UK', 'DE', 'BR', 'CA', 'AU', 'FR'],
+  months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+};
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────
+const H = {
+  randInt: (a, b) => Math.floor(Math.random() * (b - a) + a),
+  pick:    (arr)  => arr[Math.floor(Math.random() * arr.length)],
+  fmt:     (n)    => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : String(n),
+  title:   (s)    => s.charAt(0).toUpperCase() + s.slice(1).replace(/[-_]/g,' '),
+  date:    (y1, y2) => {
+    const y = H.randInt(y1, y2);
+    const m = DATA.months[H.randInt(0, 12)];
+    return `${m} ${y}`;
+  },
+  sleep:   (ms) => new Promise(r => setTimeout(r, ms)),
+  pct:     ()   => (Math.random() * 8 + 0.5).toFixed(2) + '%',
+  price:   ()   => '$' + (Math.random() * 200 + 9).toFixed(2),
+  asin:    ()   => 'B0' + Math.random().toString(36).substring(2, 9).toUpperCase(),
+  sparkArr: ()  => Array.from({ length: 12 }, () => +(Math.random() * 8 + 1).toFixed(1)),
+};
+/* ═══════════════════════════════════════════
+   WebPulse · wire.js
+   Wire API action engine (mock + real-ready)
+   ═══════════════════════════════════════════ */
+
+/**
+ * WIRE ENGINE
+ * -----------
+ * In production, each action below would call the real Wire API:
+ *   POST https://api.anakin.ai/v1/wire/actions/{actionId}
+ *   Headers: { Authorization: "Bearer YOUR_API_KEY" }
+ *   Body:    { credentials: {...}, params: { handle } }
+ *
+ * For this demo the engine returns richly structured mock data
+ * that mirrors what Wire returns — same field schema, same JSON shape.
+ */
+
+const WIRE = {
+
+  /** Simulate a realistic Wire round-trip with logging */
+  async call(actionType, target, logFn) {
+    logFn('pending', 'WIRE',  `Initiating action: ${actionType} → "${target}"`);
+    await H.sleep(H.randInt(300, 600));
+
+    logFn('info',    'AUTH',  'Credential injection OK — session token validated');
+    await H.sleep(H.randInt(250, 500));
+
+    logFn('pending', 'PROXY', 'Routing via residential proxy pool (us-east-2)');
+    await H.sleep(H.randInt(300, 550));
+
+    logFn('info',    'BOT',   'Anti-bot fingerprint applied — TLS handshake complete');
+    await H.sleep(H.randInt(200, 400));
+
+    logFn('pending', 'PARSE', 'Executing Wire action · awaiting structured JSON…');
+    await H.sleep(H.randInt(300, 600));
+
+    const action = WIRE.actions[actionType];
+    if (!action) throw new Error(`Unknown action type: ${actionType}`);
+    const result = await action(target);
+
+    const fieldCount = Object.keys(result.data).length;
+    logFn('success', 'WIRE',  `✓ Complete — ${fieldCount} fields extracted in ~1.2s`);
+
+    return result;
+  },
+
+  /** Action definitions — mirrors real Wire JSON output shapes */
+  actions: {
+
+    twitter: async (handle) => ({
+      type: 'social',
+      platform: 'Twitter / X',
+      handle: `@${handle}`,
+      data: {
+        display_name:    H.title(handle),
+        followers:       H.randInt(1200, 980000),
+        following:       H.randInt(80, 3000),
+        total_tweets:    H.randInt(200, 45000),
+        verified:        Math.random() > 0.6 ? 'Yes ✓' : 'No',
+        bio:             H.pick(DATA.bios),
+        joined:          H.date(2008, 2022),
+        avg_likes:       H.randInt(50, 15000),
+        avg_retweets:    H.randInt(10, 3000),
+        engagement_rate: H.pct(),
+        sentiment:       H.pick(['Positive (74%)', 'Neutral (58%)', 'Mixed (44%)']),
+      }
+    }),
+
+    github: async (handle) => ({
+      type: 'tech',
+      platform: 'GitHub',
+      handle,
+      data: {
+        name:               H.title(handle),
+        public_repos:       H.randInt(5, 300),
+        total_stars:        H.randInt(10, 80000),
+        followers:          H.randInt(20, 50000),
+        contributions_yr:   H.randInt(100, 3500),
+        top_language:       H.pick(DATA.languages),
+        account_age:        H.randInt(1, 14) + ' years',
+        open_issues:        H.randInt(0, 500),
+        pull_requests:      H.randInt(50, 2000),
+        profile_readme:     Math.random() > 0.5 ? 'Yes' : 'No',
+      }
+    }),
+
+    linkedin: async (handle) => ({
+      type: 'social',
+      platform: 'LinkedIn',
+      handle: H.title(handle),
+      data: {
+        name:             H.title(handle),
+        headline:         H.pick(DATA.headlines),
+        connections:      H.randInt(500, 28000) + '+',
+        current_company:  H.pick(DATA.companies),
+        experience_years: H.randInt(2, 20),
+        education:        H.pick(DATA.universities),
+        top_skills:       DATA.skills.sort(() => .5 - Math.random()).slice(0, 3).join(', '),
+        posts_per_month:  H.randInt(1, 20),
+        profile_views:    H.randInt(300, 12000),
+      }
+    }),
+
+    amazon: async (query) => ({
+      type: 'market',
+      platform: 'Amazon',
+      handle: query,
+      data: {
+        title:          query,
+        current_price:  H.price(),
+        rating:         (Math.random() * 2 + 3).toFixed(1) + ' / 5',
+        review_count:   H.randInt(50, 85000),
+        in_stock:       Math.random() > 0.2 ? 'Yes' : 'No',
+        bsr_rank:       '#' + H.randInt(1, 500) + ' in ' + H.pick(DATA.departments),
+        seller:         H.pick(DATA.sellers),
+        prime_eligible: Math.random() > 0.4 ? 'Yes' : 'No',
+        asin:           H.asin(),
+        ships_from:     H.pick(['Amazon Warehouse', 'Third-party seller', 'Brand direct']),
+      }
+    }),
+
+    reddit: async (query) => ({
+      type: 'social',
+      platform: 'Reddit',
+      handle: 'r/' + query.replace(/\s/g, ''),
+      data: {
+        subreddit:       'r/' + query.replace(/\s/g, ''),
+        members:         H.randInt(5000, 15000000),
+        online_now:      H.randInt(50, 80000),
+        posts_per_day:   H.randInt(10, 5000),
+        top_post:        H.pick(DATA.topPosts),
+        top_post_score:  H.randInt(1000, 150000),
+        moderators:      H.randInt(2, 30),
+        created:         H.date(2006, 2020),
+        nsfw:            'No',
+      }
+    }),
+
+    hacker_news: async (query) => ({
+      type: 'tech',
+      platform: 'Hacker News',
+      handle: query,
+      data: {
+        search_term:      query,
+        top_story:        H.pick(DATA.hnStories),
+        top_story_points: H.randInt(100, 2800),
+        top_story_comments: H.randInt(20, 800),
+        stories_found:    H.randInt(1, 200),
+        avg_score:        H.randInt(30, 600),
+        latest_post:      H.date(2024, 2026),
+        top_commenter:    H.pick(['pg', 'tptacek', 'dang', 'patio11', 'sama']),
+      }
+    }),
+
+    producthunt: async (query) => ({
+      type: 'market',
+      platform: 'Product Hunt',
+      handle: query,
+      data: {
+        product:       query,
+        upvotes:       H.randInt(50, 3500),
+        rank_today:    '#' + H.randInt(1, 50),
+        comments:      H.randInt(5, 200),
+        tagline:       H.pick(DATA.taglines),
+        launched:      H.date(2022, 2026),
+        website_clicks: H.randInt(200, 12000),
+        category:      H.pick(DATA.phCategories),
+        featured:      Math.random() > 0.5 ? 'Yes' : 'No',
+      }
+    }),
+
+    youtube: async (handle) => ({
+      type: 'social',
+      platform: 'YouTube',
+      handle: H.title(handle),
+      data: {
+        channel:         H.title(handle),
+        subscribers:     H.randInt(500, 15000000),
+        total_views:     H.randInt(10000, 500000000),
+        total_videos:    H.randInt(10, 2000),
+        avg_views:       H.randInt(1000, 500000),
+        latest_upload:   H.date(2025, 2026),
+        top_video:       H.pick(DATA.ytTitles),
+        top_video_views: H.randInt(10000, 10000000),
+        monetized:       Math.random() > 0.3 ? 'Yes' : 'No',
+        country:         H.pick(DATA.countries),
+      }
+    }),
+  }
+};
+/* ═══════════════════════════════════════════
+   WebPulse · ui.js
+   Rendering: cards, sparklines, log, toasts
+   ═══════════════════════════════════════════ */
+
+const UI = {
+
+  // ── PLATFORM STYLE MAP ─────────────────────────────────────────────────
+  platformStyles: {
+    'Twitter / X': { color: '#1da1f2', bg: 'rgba(29,161,242,0.12)', label: '𝕏' },
+    'GitHub':      { color: '#e8eaf0', bg: 'rgba(232,234,240,0.1)', label: '⌥' },
+    'LinkedIn':    { color: '#0a66c2', bg: 'rgba(10,102,194,0.15)', label: 'in' },
+    'Amazon':      { color: '#ff9900', bg: 'rgba(255,153,0,0.12)',  label: '◈' },
+    'Reddit':      { color: '#ff4500', bg: 'rgba(255,69,0,0.12)',   label: '◉' },
+    'Hacker News': { color: '#ff6600', bg: 'rgba(255,102,0,0.12)', label: '▲' },
+    'Product Hunt':{ color: '#da552f', bg: 'rgba(218,85,47,0.12)', label: '⬆' },
+    'YouTube':     { color: '#ff0000', bg: 'rgba(255,0,0,0.1)',    label: '▶' },
+  },
+
+  // Detect if a value should be highlighted
+  valClass(key, val) {
+    if (typeof val === 'number' && val > 9999) return 'highlight';
+    if (typeof val === 'string' && val.startsWith('$'))   return 'teal';
+    if (val === 'No' || val === 'No ✗')                  return 'danger';
+    if (val === 'Yes' || val === 'Yes ✓')                 return 'teal';
+    return '';
+  },
+
+  // ── BUILD DATA CARD ────────────────────────────────────────────────────
+  buildCard(card, idx) {
+    const { platform, handle, data, sparkData, id } = card;
+    const style = UI.platformStyles[platform] || { color: '#c9a84c', bg: 'rgba(201,168,76,0.1)', label: '◈' };
+
+    const rows = Object.entries(data).map(([k, v]) => {
+      const label = k.replace(/_/g, ' ');
+      const display = typeof v === 'number' ? H.fmt(v) : v;
+      const cls = UI.valClass(k, v);
+      return `<div class="field-row">
+        <span class="field-label">${label}</span>
+        <span class="field-val ${cls}">${display}</span>
+      </div>`;
+    }).join('');
+
+    const spark = sparkData ? `
+      <div class="spark-container">
+        <div class="spark-label">
+          <span>Engagement Trend</span>
+          <span>${sparkData[sparkData.length-1]}%</span>
+        </div>
+        <canvas class="sparkline" data-sparkid="${id}" width="300" height="44"></canvas>
+      </div>` : '';
+
+    return `<div class="data-card" style="animation-delay:${idx * 0.06}s">
+      <div class="card-head">
+        <div class="card-platform">
+          <div class="platform-icon" style="background:${style.bg};color:${style.color}">${style.label}</div>
+          <div>
+            <div class="platform-name">${platform}</div>
+            <div class="platform-handle">${handle}</div>
+          </div>
+        </div>
+        <div class="card-status">
+          <div class="status-dot"></div>
+          Live
+        </div>
+      </div>
+      <div class="card-body">
+        ${rows}
+        ${spark}
+      </div>
+    </div>`;
+  },
+
+  // ── BUILD LOG VIEW ─────────────────────────────────────────────────────
+  buildLog(logs) {
+    if (!logs.length) {
+      return `<div class="log-card">
+        <div class="log-head">
+          <div class="log-title">≡ Wire Request Log</div>
+          <span class="tag tag-teal">0 CALLS</span>
+        </div>
+        <div class="log-body" style="color:#334;font-style:italic">No calls recorded yet.</div>
+      </div>`;
+    }
+    const entries = logs.map(l => `
+      <div class="log-entry ${l.type}">
+        <span class="log-ts">${l.time}</span>
+        <span class="log-tag">[${l.source}]</span>
+        <span class="log-msg">${l.msg}</span>
+      </div>`).join('');
+
+    return `<div class="log-card">
+      <div class="log-head">
+        <div class="log-title">≡ Wire Request Log</div>
+        <span class="tag tag-teal">${logs.length} CALLS</span>
+      </div>
+      <div class="log-body" id="logBodyInner">${entries}</div>
+    </div>`;
+  },
+
+  // ── RENDER MAIN GRID ───────────────────────────────────────────────────
+  render(cards, logs, tab) {
+    const grid = document.getElementById('mainGrid');
+    const count = document.getElementById('sectionCount');
+    const title = document.getElementById('sectionTitle');
+    const bcCurrent = document.getElementById('bcCurrent');
+
+    const tabMeta = {
+      all:    { label: 'Dashboard',    bc: 'Dashboard' },
+      social: { label: 'Social Intel', bc: 'Social Intel' },
+      market: { label: 'Market Data',  bc: 'Market Data' },
+      tech:   { label: 'Tech Sources', bc: 'Tech Sources' },
+      log:    { label: 'Wire Log',     bc: 'Wire Log' },
+    };
+
+    const meta = tabMeta[tab] || tabMeta.all;
+    title.textContent = meta.label;
+    bcCurrent.textContent = meta.bc;
+
+    if (tab === 'log') {
+      grid.innerHTML = UI.buildLog(logs);
+      const inner = document.getElementById('logBodyInner');
+      if (inner) inner.scrollTop = inner.scrollHeight;
+      count.textContent = logs.length + ' log entries';
+      return;
+    }
+
+    const filtered = tab === 'all' ? cards : cards.filter(c => c.type === tab);
+    count.textContent = filtered.length + ' record' + (filtered.length !== 1 ? 's' : '');
+
+    if (!filtered.length) {
+      grid.innerHTML = cards.length
+        ? `<div class="empty-state"><div class="empty-icon">◈</div><h3>No records in this category</h3><p>Switch tabs or fetch from a different source type.</p></div>`
+        : `<div class="empty-state"><div class="empty-icon">⊞</div><h3>No data fetched yet</h3><p>Select a source, enter a target, and click <strong>Fetch via Wire</strong> — or hit <strong>⚡ Demo</strong> to see live Wire calls fire automatically.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map((c, i) => UI.buildCard(c, i)).join('');
+    UI.drawSparklines(filtered);
+  },
+
+  // ── SPARKLINES ─────────────────────────────────────────────────────────
+  drawSparklines(cards) {
+    cards.forEach(card => {
+      if (!card.sparkData) return;
+      const canvas = document.querySelector(`canvas[data-sparkid="${card.id}"]`);
+      if (!canvas) return;
+      UI.drawSparkline(canvas, card.sparkData);
+    });
+  },
+
+  drawSparkline(canvas, data) {
+    const ctx = canvas.getContext('2d');
+    const w   = canvas.offsetWidth || 260;
+    const h   = 44;
+    canvas.width = w;
+    ctx.clearRect(0, 0, w, h);
+
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const rng = max - min || 1;
+    const pts = data.map((v, i) => ({
+      x: (i / (data.length - 1)) * w,
+      y: h - ((v - min) / rng) * (h - 8) - 4,
+    }));
+
+    // Gradient fill
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(201,168,76,0.22)');
+    grad.addColorStop(1, 'rgba(201,168,76,0)');
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, h);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(pts[pts.length - 1].x, h);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = '#c9a84c';
+    ctx.lineWidth   = 1.8;
+    ctx.lineJoin    = 'round';
+    ctx.stroke();
+
+    // End dot
+    const last = pts[pts.length - 1];
+    ctx.beginPath();
+    ctx.arc(last.x, last.y, 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#e8c97a';
+    ctx.fill();
+  },
+
+  // ── TOAST ──────────────────────────────────────────────────────────────
+  toast(msg, duration = 3000) {
+    const el  = document.getElementById('toast');
+    const txt = document.getElementById('toastMsg');
+    txt.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(UI._toastTimer);
+    UI._toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+  },
+
+  // ── STATS BAR ──────────────────────────────────────────────────────────
+  updateStats(stats) {
+    ['hStatSuccess', 'hStatTotal', 'hStatSources'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = [stats.success, stats.total, stats.sources][i];
+    });
+    const v1 = document.getElementById('hsv1');
+    if (v1) v1.textContent = stats.total;
+  },
+};
+/* ═══════════════════════════════════════════
+   WebPulse · app.js
+   Application state + event handlers
+   ═══════════════════════════════════════════ */
+
+// ─── STATE ───────────────────────────────────────────────────────────────
+const APP = {
+  cards:      [],
+  logs:       [],
+  currentTab: 'all',
+  stats:      { success: 0, total: 0, sources: 0 },
+
+  // ── LOG HELPER ──────────────────────────────────────────────────────────
+  log(type, source, msg) {
+    const now = new Date();
+    const time = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    APP.logs.push({ time, type, source, msg });
+  },
+
+  // ── FETCH ONE WIRE CALL ─────────────────────────────────────────────────
+  async fetchOne(sourceType, target) {
+    const btn = document.getElementById('fetchBtn');
+    const icon = document.getElementById('fetchIcon');
+    if (btn) { btn.disabled = true; icon.textContent = '◉'; }
+
+    try {
+      const result = await WIRE.call(sourceType, target, APP.log.bind(APP));
+
+      result.id        = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+      result.sparkData = H.sparkArr();
+
+      APP.cards.push(result);
+      APP.stats.success++;
+      APP.stats.total++;
+      APP.stats.sources = new Set(APP.cards.map(c => c.platform)).size;
+
+      UI.updateStats(APP.stats);
+      UI.render(APP.cards, APP.logs, APP.currentTab);
+      UI.toast(`${result.platform} data fetched for "${target}"`);
+
+    } catch (err) {
+      APP.log('error', 'ERROR', 'Wire action failed: ' + err.message);
+      UI.render(APP.cards, APP.logs, APP.currentTab);
+      UI.toast('Wire call failed — see log for details');
+    } finally {
+      if (btn) { btn.disabled = false; icon.textContent = '▶'; }
+    }
+  },
+};
+
+// ─── GLOBAL HANDLERS (called from HTML) ──────────────────────────────────
+
+async function fetchWireData() {
+  const sourceType = document.getElementById('sourceType').value;
+  const target     = document.getElementById('targetInput').value.trim();
+  if (!target) { UI.toast('Please enter a target first'); return; }
+  await APP.fetchOne(sourceType, target);
+}
+
+async function runDemo() {
+  // Reset state
+  APP.cards = [];
+  APP.logs  = [];
+  APP.stats = { success: 0, total: 0, sources: 0 };
+  UI.updateStats(APP.stats);
+
+  // Switch to All tab
+  APP.currentTab = 'all';
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector('.nav-item')?.classList.add('active');
+
+  const overlay   = document.getElementById('loadingOverlay');
+  const loadingTxt = document.getElementById('loadingText');
+  overlay.style.display = 'flex';
+
+  const demo = [
+    { source: 'github',       target: 'anakin-ai'       },
+    { source: 'twitter',      target: 'elonmusk'        },
+    { source: 'producthunt',  target: 'Wire by Anakin'  },
+    { source: 'hacker_news',  target: 'Wire API'        },
+    { source: 'amazon',       target: 'Node.js Cookbook'},
+    { source: 'youtube',      target: 'fireship'        },
+  ];
+
+  for (let i = 0; i < demo.length; i++) {
+    const item = demo[i];
+    loadingTxt.textContent = `Firing Wire call ${i+1}/${demo.length} — ${item.source}…`;
+    document.getElementById('sourceType').value  = item.source;
+    document.getElementById('targetInput').value = item.target;
+    await APP.fetchOne(item.source, item.target);
+    await H.sleep(350);
+  }
+
+  overlay.style.display = 'none';
+  UI.toast('Demo complete — all 6 Wire calls fired successfully');
+}
+
+function switchTab(tab, el) {
+  APP.currentTab = tab;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  UI.render(APP.cards, APP.logs, tab);
+}
+
+function switchTabBtn(btn, tab) {
+  switchTab(tab, btn);
+}
+
+function exportData() {
+  if (!APP.cards.length) { UI.toast('No data to export — fetch some records first'); return; }
+  const payload = APP.cards.map(c => ({
+    platform: c.platform,
+    handle:   c.handle,
+    type:     c.type,
+    data:     c.data,
+  }));
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `webpulse-export-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  UI.toast(`Exported ${APP.cards.length} records as JSON`);
+}
+
+function clearAll() {
+  APP.cards = [];
+  APP.logs  = [];
+  APP.stats = { success: 0, total: 0, sources: 0 };
+  UI.updateStats(APP.stats);
+  UI.render(APP.cards, APP.logs, APP.currentTab);
+  UI.toast('Dashboard cleared');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  UI.render(APP.cards, APP.logs, APP.currentTab);
+  UI.updateStats(APP.stats);
+});
+  </script>
+</body>
+</html>
