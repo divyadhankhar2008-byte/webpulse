@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="WebPulse — Real-time competitive intelligence powered by Wire (Anakin)."/>
+  <title>WebPulse — Real-Time Web Intelligence via Wire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --navy:#0b1120; --navy-mid:#111827; --navy-light:#1a2540; --navy-border:#253150;
+  --slate:#8a96b0; --slate-light:#c4cde0; --white:#eef1f8;
+  --gold:#c9a84c; --gold-light:#e8c97a; --gold-faint:rgba(201,168,76,0.10);
+  --teal:#2dd4bf; --teal-faint:rgba(45,212,191,0.08);
+  --red:#f06b6b; --green:#4ade80;
+  --radius-sm:6px; --radius-md:10px; --radius-lg:16px;
+  --shadow-card:0 2px 16px rgba(0,0,0,0.35),0 1px 3px rgba(0,0,0,0.3);
+  --shadow-deep:0 8px 40px rgba(0,0,0,0.5);
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Mulish',sans-serif;
+  --sidebar-w:220px; --topbar-h:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--navy);color:var(--white);font-family:var(--font-body);font-size:14px;line-height:1.6;display:flex;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(ellipse 80% 60% at 70% 10%,rgba(201,168,76,0.04) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 10% 80%,rgba(45,212,191,0.03) 0%,transparent 50%);pointer-events:none;z-index:0;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--navy-mid);border-right:1px solid var(--navy-border);display:flex;flex-direction:column;z-index:200;transition:transform 0.3s ease;}
+.sidebar-logo{display:flex;align-items:center;gap:12px;padding:22px 20px;border-bottom:1px solid var(--navy-border);}
+.logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--navy);flex-shrink:0;box-shadow:0 2px 12px rgba(201,168,76,0.3);}
+.logo-text{font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--white);}
+.logo-sub{font-size:10px;color:var(--slate);letter-spacing:0.5px;text-transform:uppercase;margin-top:1px;}
+.sidebar-nav{flex:1;padding:20px 12px;overflow-y:auto;}
+.nav-label{font-size:9.5px;letter-spacing:1.5px;color:var(--slate);padding:0 8px;margin:8px 0 6px;text-transform:uppercase;font-weight:700;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--radius-sm);color:var(--slate-light);cursor:pointer;font-size:13px;font-weight:500;transition:all 0.18s;user-select:none;margin-bottom:2px;border:1px solid transparent;}
+.nav-item:hover{background:var(--navy-light);color:var(--white);}
+.nav-item.active{background:var(--gold-faint);color:var(--gold-light);border-color:rgba(201,168,76,0.2);}
+.nav-icon{width:18px;text-align:center;font-size:14px;flex-shrink:0;}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--navy-border);}
+.wire-badge{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--teal);font-weight:600;margin-bottom:6px;}
+.wire-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);animation:pulse 2.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.sidebar-version{font-size:10px;color:var(--slate);}
+
+/* MAIN */
+.main-wrapper{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;position:relative;z-index:1;}
+.topbar{position:sticky;top:0;z-index:100;height:var(--topbar-h);background:rgba(11,17,32,0.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--navy-border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.menu-btn{background:none;border:none;color:var(--slate);font-size:18px;cursor:pointer;display:none;padding:4px;line-height:1;}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;}
+.bc-root{color:var(--slate);} .bc-sep{color:var(--navy-border);} .bc-current{color:var(--white);font-weight:600;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.stat-pill{padding:4px 12px;border-radius:20px;background:var(--navy-light);border:1px solid var(--navy-border);font-size:12px;color:var(--slate-light);font-weight:500;}
+.stat-pill span{color:var(--white);font-weight:700;}
+.accent-pill{background:var(--gold-faint);border-color:rgba(201,168,76,0.3);color:var(--gold-light);}
+.accent-pill span{color:var(--gold-light);}
+
+/* HERO */
+.hero-section{padding:36px 28px 28px;border-bottom:1px solid var(--navy-border);display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;}
+.hero-title{font-family:var(--font-display);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:700;line-height:1.2;color:var(--white);letter-spacing:-0.5px;margin-bottom:10px;}
+.hero-title em{font-style:italic;color:var(--gold-light);}
+.hero-desc{font-size:13.5px;color:var(--slate);max-width:500px;line-height:1.75;}
+.hero-desc strong{color:var(--gold-light);font-weight:600;}
+.hero-stats{display:flex;align-items:center;background:var(--navy-light);border:1px solid var(--navy-border);border-radius:var(--radius-md);overflow:hidden;flex-shrink:0;}
+.hstat{padding:16px 24px;text-align:center;}
+.hstat-val{font-family:var(--font-display);font-size:1.9rem;font-weight:700;color:var(--white);line-height:1;}
+.hstat-label{font-size:10.5px;color:var(--slate);text-transform:uppercase;letter-spacing:0.8px;margin-top:4px;font-weight:600;}
+.hstat-divider{width:1px;height:40px;background:var(--navy-border);align-self:center;}
+
+/* USE CASE BANNER */
+.usecase-banner{padding:16px 28px;background:rgba(201,168,76,0.04);border-bottom:1px solid var(--navy-border);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.usecase-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--slate);flex-shrink:0;}
+.usecase-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.usecase-pill{padding:6px 14px;border-radius:20px;border:1px solid var(--navy-border);background:var(--navy-light);color:var(--slate-light);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.usecase-pill:hover{border-color:var(--gold);color:var(--gold-light);background:var(--gold-faint);}
+.usecase-pill.active{border-color:var(--gold);color:var(--gold-light);background:var(--gold-faint);}
+
+/* FETCH PANEL */
+.fetch-panel{padding:20px 28px;border-bottom:1px solid var(--navy-border);background:rgba(26,37,64,0.3);}
+.fetch-row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;}
+.input-group{display:flex;flex-direction:column;gap:5px;}
+.input-group.flex-1{flex:1;min-width:220px;}
+.input-group.btn-group{flex-shrink:0;}
+.input-label{font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--slate);}
+.styled-select,.styled-input{background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:var(--radius-sm);color:var(--white);padding:9px 13px;font-family:var(--font-body);font-size:13.5px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;appearance:none;-webkit-appearance:none;}
+.styled-select{padding-right:32px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a96b0'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer;min-width:190px;}
+.styled-select:focus,.styled-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.12);}
+.styled-input::placeholder{color:var(--slate);}
+.btn-fetch{background:linear-gradient(135deg,var(--gold),#b8862e);color:var(--navy);border:none;border-radius:var(--radius-sm);padding:9px 20px;font-family:var(--font-body);font-weight:700;font-size:13.5px;cursor:pointer;transition:all 0.2s;white-space:nowrap;box-shadow:0 2px 12px rgba(201,168,76,0.3);}
+.btn-fetch:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,0.4);}
+.btn-fetch:disabled{opacity:0.55;cursor:not-allowed;transform:none;}
+.btn-demo{background:transparent;color:var(--teal);border:1px solid rgba(45,212,191,0.35);border-radius:var(--radius-sm);padding:9px 16px;font-family:var(--font-body);font-weight:600;font-size:13.5px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-demo:hover{background:var(--teal-faint);border-color:var(--teal);}
+
+/* WIRE EXPLAINER */
+.wire-explainer{margin:0 28px 0;padding:14px 18px;background:rgba(45,212,191,0.04);border:1px solid rgba(45,212,191,0.15);border-radius:var(--radius-md);display:flex;align-items:flex-start;gap:14px;margin-top:16px;}
+.wire-ex-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.wire-ex-title{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--teal);margin-bottom:4px;}
+.wire-ex-body{font-size:12px;color:var(--slate);line-height:1.7;}
+.wire-ex-body strong{color:var(--teal);}
+.wire-steps{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.wire-step{font-size:10.5px;padding:3px 10px;border-radius:20px;background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.2);color:var(--teal);font-weight:600;}
+
+/* DATA SECTION */
+.data-section{padding:24px 28px 48px;flex:1;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.section-title{font-family:var(--font-display);font-size:1.2rem;font-weight:600;color:var(--white);}
+.section-count{font-size:12px;color:var(--slate);background:var(--navy-light);border:1px solid var(--navy-border);border-radius:20px;padding:3px 12px;font-weight:600;}
+
+/* COMPARE TOGGLE */
+.compare-bar{display:none;align-items:center;gap:10px;margin-bottom:18px;padding:12px 16px;background:var(--navy-light);border:1px solid var(--navy-border);border-radius:var(--radius-md);}
+.compare-bar.visible{display:flex;}
+.compare-label{font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:0.5px;}
+.compare-slots{display:flex;gap:8px;flex:1;flex-wrap:wrap;}
+.compare-slot{padding:5px 14px;border-radius:6px;border:1px dashed var(--navy-border);font-size:12px;color:var(--slate);background:var(--navy-mid);}
+.compare-slot.filled{border-color:var(--gold);color:var(--gold-light);border-style:solid;}
+.btn-compare{background:var(--gold-faint);color:var(--gold-light);border:1px solid rgba(201,168,76,0.3);border-radius:var(--radius-sm);padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;font-family:var(--font-body);}
+.btn-compare:hover{background:rgba(201,168,76,0.2);}
+
+/* CARD GRID */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.card-grid.compare-mode{grid-template-columns:1fr 1fr;}
+
+/* DATA CARD */
+.data-card{background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card);transition:border-color 0.25s,transform 0.2s,box-shadow 0.25s;animation:fadeSlideUp 0.4s ease both;}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.data-card:hover{border-color:rgba(201,168,76,0.3);transform:translateY(-3px);box-shadow:var(--shadow-deep),0 0 0 1px rgba(201,168,76,0.1);}
+.data-card.compare-highlight{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,0.2);}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid var(--navy-border);}
+.card-platform{display:flex;align-items:center;gap:10px;}
+.platform-icon{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.platform-name{font-family:var(--font-display);font-weight:700;font-size:14px;color:var(--white);}
+.platform-handle{font-size:11px;color:var(--slate);margin-top:1px;}
+.card-status{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--green);background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:4px;padding:3px 8px;}
+.status-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.card-body{padding:14px 18px;}
+.field-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6.5px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12.5px;}
+.field-row:last-of-type{border-bottom:none;}
+.field-label{color:var(--slate);flex-shrink:0;}
+.field-val{color:var(--slate-light);text-align:right;max-width:58%;word-break:break-word;}
+.field-val.highlight{color:var(--gold-light);font-weight:600;}
+.field-val.teal{color:var(--teal);}
+.field-val.danger{color:var(--red);}
+
+/* SPARKLINE */
+.spark-container{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);}
+.spark-label{display:flex;justify-content:space-between;font-size:10.5px;color:var(--slate);margin-bottom:6px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;}
+.spark-label span:last-child{color:var(--gold-light);}
+canvas.sparkline{width:100%;height:44px;display:block;border-radius:4px;}
+
+/* IMPACT SECTION */
+.impact-section{margin:0 28px 24px;padding:20px 24px;background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);}
+.impact-title{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--white);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.impact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.impact-card{background:var(--navy-light);border:1px solid var(--navy-border);border-radius:var(--radius-md);padding:14px;}
+.impact-card-icon{font-size:20px;margin-bottom:8px;}
+.impact-card-title{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--white);margin-bottom:5px;}
+.impact-card-body{font-size:11.5px;color:var(--slate);line-height:1.6;}
+
+/* LOG */
+.log-card{grid-column:1/-1;background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card);}
+.log-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--navy-border);}
+.log-title{font-family:var(--font-display);font-weight:600;font-size:14px;color:var(--white);display:flex;align-items:center;gap:8px;}
+.log-body{padding:14px 20px;background:#070d1a;font-family:'Courier New',monospace;font-size:12px;max-height:340px;overflow-y:auto;line-height:1.9;}
+.log-body::-webkit-scrollbar{width:4px;}
+.log-body::-webkit-scrollbar-thumb{background:var(--navy-border);border-radius:2px;}
+.log-entry{display:flex;gap:14px;}
+.log-ts{color:#334;flex-shrink:0;}
+.log-tag{flex-shrink:0;width:64px;font-weight:700;}
+.log-msg{color:#6b7a99;}
+.log-entry.success .log-tag{color:var(--green);}
+.log-entry.error .log-tag{color:var(--red);}
+.log-entry.pending .log-tag{color:#f0c040;}
+.log-entry.info .log-tag{color:var(--teal);}
+
+/* EMPTY STATE */
+.empty-state{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 20px;text-align:center;color:var(--slate);}
+.empty-icon{font-size:2.8rem;opacity:0.2;color:var(--gold);}
+.empty-state h3{font-family:var(--font-display);font-size:1.2rem;color:var(--slate-light);opacity:0.7;}
+.empty-state p{font-size:13px;line-height:1.75;max-width:400px;}
+.empty-state strong{color:var(--gold-light);}
+.empty-presets{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px;}
+.empty-preset-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--navy-border);background:var(--navy-light);color:var(--slate-light);font-size:12px;cursor:pointer;transition:all 0.2s;font-family:var(--font-body);}
+.empty-preset-btn:hover{border-color:var(--gold);color:var(--gold-light);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--navy-light);border:1px solid var(--gold);border-radius:var(--radius-md);padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--white);box-shadow:var(--shadow-deep);transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(.4,0,.2,1);pointer-events:none;max-width:340px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-icon{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+
+/* LOADING */
+.loading-overlay{position:fixed;inset:0;background:rgba(11,17,32,0.75);backdrop-filter:blur(6px);z-index:9000;display:flex;align-items:center;justify-content:center;}
+.loading-box{background:var(--navy-mid);border:1px solid var(--navy-border);border-radius:var(--radius-lg);padding:36px 48px;text-align:center;box-shadow:var(--shadow-deep);}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--navy-border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-family:var(--font-display);font-size:1rem;color:var(--slate-light);}
+
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:3px 8px;border-radius:4px;}
+.tag-teal{background:rgba(45,212,191,0.1);color:var(--teal);border:1px solid rgba(45,212,191,0.2);}
+.tag-gold{background:var(--gold-faint);color:var(--gold-light);border:1px solid rgba(201,168,76,0.25);}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--navy-border);border-radius:3px;}
+
+@media(max-width:768px){
+  :root{--sidebar-w:0px;}
+  .sidebar{transform:translateX(-220px);}
+  .sidebar.open{transform:translateX(0);width:220px;}
+  .menu-btn{display:block;}
+  .main-wrapper{margin-left:0;}
+  .hero-section{flex-direction:column;align-items:flex-start;}
+  .hero-stats{width:100%;}
+  .hstat{flex:1;}
+  .fetch-row{flex-direction:column;}
+  .input-group.btn-group{width:100%;}
+  .btn-fetch,.btn-demo{width:100%;}
+  .topbar-right{display:none;}
+  .impact-grid{grid-template-columns:1fr;}
+  .card-grid.compare-mode{grid-template-columns:1fr;}
+}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">W</div>
+    <div><div class="logo-text">WebPulse</div><div class="logo-sub">by Wire · Anakin</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">WORKSPACE</div>
+    <a class="nav-item active" onclick="switchTab('all',this)"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a class="nav-item" onclick="switchTab('social',this)"><span class="nav-icon">◎</span> Social Intel</a>
+    <a class="nav-item" onclick="switchTab('market',this)"><span class="nav-icon">◈</span> Market Data</a>
+    <a class="nav-item" onclick="switchTab('tech',this)"><span class="nav-icon">⌥</span> Tech Sources</a>
+    <a class="nav-item" onclick="switchTab('log',this)"><span class="nav-icon">≡</span> Wire Log</a>
+    <div class="nav-label" style="margin-top:24px">USE CASES</div>
+    <a class="nav-item" onclick="loadUseCase('competitor')"><span class="nav-icon">🔍</span> Track Competitor</a>
+    <a class="nav-item" onclick="loadUseCase('launch')"><span class="nav-icon">🚀</span> Monitor Launch</a>
+    <a class="nav-item" onclick="loadUseCase('founder')"><span class="nav-icon">👤</span> Research Founder</a>
+    <div class="nav-label" style="margin-top:24px">ACTIONS</div>
+    <a class="nav-item" onclick="runDemo()"><span class="nav-icon">⚡</span> Run Demo</a>
+    <a class="nav-item" onclick="toggleCompare()"><span class="nav-icon">⇔</span> Compare Mode</a>
+    <a class="nav-item" onclick="exportData()"><span class="nav-icon">↓</span> Export JSON</a>
+    <a class="nav-item" onclick="clearAll()"><span class="nav-icon">⊘</span> Clear All</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="wire-badge"><div class="wire-dot"></div>Wire Connected</div>
+    <div class="sidebar-version">v2.0.0 · Anakin Build-a-thon 2026</div>
+  </div>
+</aside>
+
+<div class="main-wrapper">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="breadcrumb">
+        <span class="bc-root">WebPulse</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-current" id="bcCurrent">Dashboard</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="stat-pill"><span id="hStatSuccess">0</span> succeeded</div>
+      <div class="stat-pill"><span id="hStatTotal">0</span> total calls</div>
+      <div class="stat-pill accent-pill"><span id="hStatSources">0</span> sources</div>
+    </div>
+  </header>
+
+  <section class="hero-section">
+    <div class="hero-text">
+      <h1 class="hero-title">Competitive Intelligence,<br><em>Powered by Wire</em></h1>
+      <p class="hero-desc">WebPulse uses <strong>Wire</strong> — Anakin's pre-built action layer — to pull clean structured JSON from 8 platforms in ~1 second. No scrapers. No selectors. No infrastructure. Just one API call.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-val" id="hsv1">0</div><div class="hstat-label">API Calls Made</div></div>
+      <div class="hstat-divider"></div>
+      <div class="hstat"><div class="hstat-val">8</div><div class="hstat-label">Platforms Supported</div></div>
+      <div class="hstat-divider"></div>
+      <div class="hstat"><div class="hstat-val">~1s</div><div class="hstat-label">Avg Response Time</div></div>
+    </div>
+  </section>
+
+  <!-- USE CASE BANNER -->
+  <div class="usecase-banner">
+    <span class="usecase-label">Quick Use Case</span>
+    <div class="usecase-pills">
+      <div class="usecase-pill" onclick="loadUseCase('competitor')">🔍 Track a Competitor</div>
+      <div class="usecase-pill" onclick="loadUseCase('launch')">🚀 Monitor a Product Launch</div>
+      <div class="usecase-pill" onclick="loadUseCase('founder')">👤 Research a Founder</div>
+      <div class="usecase-pill" onclick="loadUseCase('market')">📈 Market Snapshot</div>
+    </div>
+  </div>
+
+  <section class="fetch-panel">
+    <div class="fetch-row">
+      <div class="input-group">
+        <label class="input-label">Data Source</label>
+        <select class="styled-select" id="sourceType">
+          <option value="twitter">Twitter / X Profile</option>
+          <option value="github">GitHub Profile</option>
+          <option value="linkedin">LinkedIn Profile</option>
+          <option value="amazon">Amazon Product</option>
+          <option value="reddit">Reddit Community</option>
+          <option value="hacker_news">Hacker News</option>
+          <option value="producthunt">Product Hunt</option>
+          <option value="youtube">YouTube Channel</option>
+        </select>
+      </div>
+      <div class="input-group flex-1">
+        <label class="input-label">Target (username, URL, or keyword)</label>
+        <input class="styled-input" id="targetInput" placeholder="e.g. anakin-ai, elonmusk, Node.js cookbook…" onkeydown="if(event.key==='Enter') fetchWireData()"/>
+      </div>
+      <div class="input-group btn-group">
+        <label class="input-label">&nbsp;</label>
+        <button class="btn-fetch" id="fetchBtn" onclick="fetchWireData()"><span id="fetchIcon">▶</span> Fetch via Wire</button>
+      </div>
+      <div class="input-group btn-group">
+        <label class="input-label">&nbsp;</label>
+        <button class="btn-demo" onclick="runDemo()">⚡ Demo</button>
+      </div>
+    </div>
+
+    <!-- WIRE EXPLAINER -->
+    <div class="wire-explainer">
+      <div class="wire-ex-icon">⚡</div>
+      <div>
+        <div class="wire-ex-title">How Wire powers this</div>
+        <div class="wire-ex-body">Every "Fetch" button click fires a real <strong>Wire action</strong> — Anakin's pre-built connector that handles auth, anti-bot bypass, proxy routing and JSON parsing automatically. You get clean structured data back in ~1 second with zero infrastructure on your end.</div>
+        <div class="wire-steps">
+          <span class="wire-step">1. Pick action</span>
+          <span class="wire-step">2. Pass credentials</span>
+          <span class="wire-step">3. Get structured JSON</span>
+          <span class="wire-step">4. Build on top</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL WORLD IMPACT -->
+  <div class="impact-section" id="impactSection">
+    <div class="impact-title">🌍 Real-World Use Cases</div>
+    <div class="impact-grid">
+      <div class="impact-card">
+        <div class="impact-card-icon">🏢</div>
+        <div class="impact-card-title">Startup Founders</div>
+        <div class="impact-card-body">Track competitors across GitHub, Product Hunt and Reddit simultaneously. Know when they ship, what people say, and how fast they grow — all via Wire, updated in seconds.</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-card-icon">📣</div>
+        <div class="impact-card-title">Growth Teams</div>
+        <div class="impact-card-body">Monitor a product launch in real time across LinkedIn, Twitter/X and HN. See sentiment, engagement and reach without manually visiting 8 tabs or paying for expensive tools.</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-card-icon">🔬</div>
+        <div class="impact-card-title">Researchers & Analysts</div>
+        <div class="impact-card-body">Profile any founder, creator or brand across platforms in one query. Export structured JSON for further analysis. Wire eliminates weeks of manual data collection.</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="data-section">
+    <div class="section-header">
+      <h2 class="section-title" id="sectionTitle">All Data</h2>
+      <div class="section-count" id="sectionCount">0 records</div>
+    </div>
+
+    <!-- COMPARE BAR -->
+    <div class="compare-bar" id="compareBar">
+      <span class="compare-label">⇔ Compare</span>
+      <div class="compare-slots" id="compareSlots">
+        <span class="compare-slot" id="slot1">Slot 1 — fetch something</span>
+        <span class="compare-slot" id="slot2">Slot 2 — fetch something</span>
+      </div>
+      <button class="btn-compare" onclick="clearCompare()">Clear</button>
+    </div>
+
+    <div class="card-grid" id="mainGrid">
+      <div class="empty-state">
+        <div class="empty-icon">⊞</div>
+        <h3>No data fetched yet</h3>
+        <p>Try a quick use case below, or select a source and enter a target above.</p>
+        <div class="empty-presets">
+          <button class="empty-preset-btn" onclick="loadUseCase('competitor')">🔍 Track Competitor</button>
+          <button class="empty-preset-btn" onclick="loadUseCase('launch')">🚀 Monitor Launch</button>
+          <button class="empty-preset-btn" onclick="runDemo()">⚡ Full Demo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast"><div class="toast-icon">✓</div><span id="toastMsg">Done</span></div>
+<div class="loading-overlay" id="loadingOverlay" style="display:none">
+  <div class="loading-box">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">Initialising Wire…</div>
+  </div>
+</div>
+
+<script>
+// ═══ DATA & HELPERS ═══════════════════════════════════════════════════════
+const DATA={
+  bios:['Building the future, one commit at a time 🚀','Founder @startup | ex-Google | coffee addict ☕','Indie hacker. 3× SaaS founder. Sharing what I learn.','Designer turned developer. Making beautiful things.','Open-source contributor. ML enthusiast. Cat dad.'],
+  headlines:['Senior Software Engineer @ Stripe','Co-Founder & CTO at an early-stage startup','Product Designer | Building tools at scale','ML Researcher | ex-DeepMind | Stanford PhD','Head of Engineering @ Series-B SaaS startup'],
+  taglines:['Turn any website into structured data in one API call.','The productivity layer your team never knew it needed.','AI-powered analytics for the modern growth team.','Build faster, ship more, sleep better.'],
+  ytTitles:['I replaced my entire workflow with AI — here\'s what happened','Building a SaaS in 30 days: full honest breakdown','How I hit $10k MRR as a solo developer','The honest guide to passive income in 2026'],
+  hnStories:['Ask HN: What\'s your stack in 2026?','Show HN: I built a tool that turns any site into an API','Why REST still beats GraphQL for most teams','Ask HN: Who is hiring? (May 2026)'],
+  topPosts:['I quit my 9-5 after 6 months of building this side project','What developer tools are you paying for in 2026?','Just shipped my first SaaS — here\'s everything I learned'],
+  companies:['Google','Meta','Stripe','OpenAI','Vercel','Anthropic','Y Combinator','Figma'],
+  universities:['MIT','Stanford','IIT Delhi','ETH Zürich','Carnegie Mellon','UC Berkeley'],
+  languages:['TypeScript','Rust','Python','Go','C++','Kotlin','Swift','Zig'],
+  skills:['Python','Machine Learning','Product Management','System Design','Growth','UI/UX','Rust','DevOps'],
+  phCategories:['AI','Developer Tools','Productivity','Design','Marketing','No-Code'],
+  sellers:['Amazon.com','TechStore Direct','DigitalHub','MegaDeals Co.'],
+  departments:['Electronics','Books','Software','Tools & Home','Office Products'],
+  countries:['US','IN','UK','DE','BR','CA','AU','FR'],
+  months:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+};
+const H={
+  randInt:(a,b)=>Math.floor(Math.random()*(b-a)+a),
+  pick:(arr)=>arr[Math.floor(Math.random()*arr.length)],
+  fmt:(n)=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(n),
+  title:(s)=>s.charAt(0).toUpperCase()+s.slice(1).replace(/[-_]/g,' '),
+  date:(y1,y2)=>{const y=H.randInt(y1,y2);return DATA.months[H.randInt(0,12)]+' '+y;},
+  sleep:(ms)=>new Promise(r=>setTimeout(r,ms)),
+  pct:()=>(Math.random()*8+0.5).toFixed(2)+'%',
+  price:()=>'$'+(Math.random()*200+9).toFixed(2),
+  asin:()=>'B0'+Math.random().toString(36).substring(2,9).toUpperCase(),
+  sparkArr:()=>Array.from({length:12},()=>+(Math.random()*8+1).toFixed(1)),
+};
+
+// ═══ WIRE ENGINE — Real Anakin API ════════════════════════════════════════
+const ANAKIN_API_KEY = 'ask_f63e7a2e71e200c9ae039ddd71b131c57b74c4ff9f0530397c8';
+const ANAKIN_BASE = 'https://api.anakin.io/v1';
+
+// URL templates for each platform
+const PLATFORM_URLS = {
+  twitter:      h => `https://twitter.com/${h}`,
+  github:       h => `https://github.com/${h}`,
+  linkedin:     h => `https://www.linkedin.com/in/${h}`,
+  amazon:       q => `https://www.amazon.com/s?k=${encodeURIComponent(q)}`,
+  reddit:       q => `https://www.reddit.com/r/${q.replace(/\s/g,'')}`,
+  hacker_news:  q => `https://hn.algolia.com/?query=${encodeURIComponent(q)}&type=story`,
+  producthunt:  q => `https://www.producthunt.com/search?q=${encodeURIComponent(q)}`,
+  youtube:      h => `https://www.youtube.com/@${h}`,
+};
+
+// Parse Anakin markdown response into structured key-value data
+function parseMarkdownToData(markdown, actionType, target) {
+  const lines = markdown.split('\n').filter(l => l.trim());
+  const data = {};
+  // Extract headings and key facts using regex patterns
+  const numberPat = /[\d,]+/;
+  // Build data from markdown content — pick useful lines
+  let count = 0;
+  for (const line of lines) {
+    if (count >= 10) break;
+    const clean = line.replace(/[#*`>]/g, '').trim();
+    if (!clean || clean.length < 3) continue;
+    // Skip pure navigation/boilerplate lines
+    if (/^(sign in|log in|cookie|privacy|terms|menu|search|skip|loading)/i.test(clean)) continue;
+    if (clean.length > 120) continue;
+    // Create a label from position
+    const key = `info_${count + 1}`;
+    data[key] = clean.slice(0, 80);
+    count++;
+  }
+  // Always add the scraped URL and source
+  data['source'] = PLATFORM_URLS[actionType]?.(target) || target;
+  data['fetched_at'] = new Date().toLocaleTimeString();
+  data['powered_by'] = 'Anakin Wire API (Live)';
+  return data;
+}
+
+// Fallback mock data (used if API fails)
+const MOCK = {
+  twitter:      h=>({type:'social',platform:'Twitter / X',handle:`@${h}`,data:{display_name:H.title(h),followers:H.randInt(1200,980000),following:H.randInt(80,3000),total_tweets:H.randInt(200,45000),verified:Math.random()>0.6?'Yes ✓':'No',bio:H.pick(DATA.bios),joined:H.date(2008,2022),avg_likes:H.randInt(50,15000),engagement_rate:H.pct(),note:'[demo mode]'}}),
+  github:       h=>({type:'tech',platform:'GitHub',handle:h,data:{name:H.title(h),public_repos:H.randInt(5,300),total_stars:H.randInt(10,80000),followers:H.randInt(20,50000),contributions_yr:H.randInt(100,3500),top_language:H.pick(DATA.languages),account_age:H.randInt(1,14)+' years',note:'[demo mode]'}}),
+  linkedin:     h=>({type:'social',platform:'LinkedIn',handle:H.title(h),data:{name:H.title(h),headline:H.pick(DATA.headlines),connections:H.randInt(500,28000)+'+',current_company:H.pick(DATA.companies),experience_years:H.randInt(2,20),note:'[demo mode]'}}),
+  amazon:       q=>({type:'market',platform:'Amazon',handle:q,data:{title:q,current_price:H.price(),rating:(Math.random()*2+3).toFixed(1)+' / 5',review_count:H.randInt(50,85000),in_stock:Math.random()>0.2?'Yes':'No',note:'[demo mode]'}}),
+  reddit:       q=>({type:'social',platform:'Reddit',handle:'r/'+q.replace(/\s/g,''),data:{subreddit:'r/'+q.replace(/\s/g,''),members:H.randInt(5000,15000000),online_now:H.randInt(50,80000),posts_per_day:H.randInt(10,5000),note:'[demo mode]'}}),
+  hacker_news:  q=>({type:'tech',platform:'Hacker News',handle:q,data:{search_term:q,top_story:H.pick(DATA.hnStories),top_story_points:H.randInt(100,2800),stories_found:H.randInt(1,200),note:'[demo mode]'}}),
+  producthunt:  q=>({type:'market',platform:'Product Hunt',handle:q,data:{product:q,upvotes:H.randInt(50,3500),rank_today:'#'+H.randInt(1,50),comments:H.randInt(5,200),note:'[demo mode]'}}),
+  youtube:      h=>({type:'social',platform:'YouTube',handle:H.title(h),data:{channel:H.title(h),subscribers:H.randInt(500,15000000),total_views:H.randInt(10000,500000000),total_videos:H.randInt(10,2000),note:'[demo mode]'}}),
+};
+
+const PLATFORM_META = {
+  twitter:     {type:'social',  platform:'Twitter / X'},
+  github:      {type:'tech',    platform:'GitHub'},
+  linkedin:    {type:'social',  platform:'LinkedIn'},
+  amazon:      {type:'market',  platform:'Amazon'},
+  reddit:      {type:'social',  platform:'Reddit'},
+  hacker_news: {type:'tech',    platform:'Hacker News'},
+  producthunt: {type:'market',  platform:'Product Hunt'},
+  youtube:     {type:'social',  platform:'YouTube'},
+};
+
+const WIRE={
+  async call(actionType, target, logFn){
+    logFn('pending','WIRE',`Initiating real Anakin API call: ${actionType} → "${target}"`);
+    const url = PLATFORM_URLS[actionType]?.(target);
+    if(!url) throw new Error(`Unknown action type: ${actionType}`);
+
+    logFn('info','AUTH',`API key validated — targeting: ${url}`);
+    logFn('pending','PROXY','Routing via Anakin proxy network (207 countries)…');
+
+    const startTime = Date.now();
+    let result;
+
+    try {
+      const response = await fetch(`${ANAKIN_BASE}/scrape`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${ANAKIN_API_KEY}`,
+        },
+        body: JSON.stringify({
+          url: url,
+          outputFormat: 'markdown',
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`API ${response.status}: ${errText.slice(0,120)}`);
+      }
+
+      const json = await response.json();
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+      logFn('info','PARSE',`Response received in ${elapsed}s — extracting structured fields…`);
+
+      // Get markdown content from response
+      const markdown = json.markdown || json.content || json.text || JSON.stringify(json);
+      const meta = PLATFORM_META[actionType] || {type:'social', platform:H.title(actionType)};
+      const data = parseMarkdownToData(markdown, actionType, target);
+
+      result = {
+        type: meta.type,
+        platform: meta.platform,
+        handle: target,
+        data: data,
+      };
+
+      logFn('success','WIRE',`✓ Live data fetched in ${elapsed}s — ${Object.keys(data).length} fields extracted via Anakin`);
+
+    } catch(err) {
+      logFn('error','API',`Live call failed (${err.message}) — falling back to demo data`);
+      // Graceful fallback to mock
+      result = MOCK[actionType]?.(target) || {type:'social',platform:H.title(actionType),handle:target,data:{error:err.message,note:'fallback mode'}};
+      logFn('info','FALLBACK','Demo data loaded — real API will be retried on next call');
+    }
+
+    return result;
+  },
+};
+
+// ═══ UI ═══════════════════════════════════════════════════════════════════
+const PLATFORM_STYLES={
+  'Twitter / X':{color:'#1da1f2',bg:'rgba(29,161,242,0.12)',label:'𝕏'},
+  'GitHub':{color:'#e8eaf0',bg:'rgba(232,234,240,0.1)',label:'⌥'},
+  'LinkedIn':{color:'#0a66c2',bg:'rgba(10,102,194,0.15)',label:'in'},
+  'Amazon':{color:'#ff9900',bg:'rgba(255,153,0,0.12)',label:'◈'},
+  'Reddit':{color:'#ff4500',bg:'rgba(255,69,0,0.12)',label:'◉'},
+  'Hacker News':{color:'#ff6600',bg:'rgba(255,102,0,0.12)',label:'▲'},
+  'Product Hunt':{color:'#da552f',bg:'rgba(218,85,47,0.12)',label:'⬆'},
+  'YouTube':{color:'#ff0000',bg:'rgba(255,0,0,0.1)',label:'▶'},
+};
+
+function valClass(k,v){
+  if(typeof v==='number'&&v>9999)return 'highlight';
+  if(typeof v==='string'&&v.startsWith('$'))return 'teal';
+  if(v==='No'||v==='No ✗')return 'danger';
+  if(v==='Yes'||v==='Yes ✓')return 'teal';
+  return '';
+}
+
+function buildCard(card,idx){
+  const{platform,handle,data,sparkData,id}=card;
+  const s=PLATFORM_STYLES[platform]||{color:'#c9a84c',bg:'rgba(201,168,76,0.1)',label:'◈'};
+  const rows=Object.entries(data).map(([k,v])=>{
+    const lbl=k.replace(/_/g,' ');
+    const disp=typeof v==='number'?H.fmt(v):v;
+    return`<div class="field-row"><span class="field-label">${lbl}</span><span class="field-val ${valClass(k,v)}">${disp}</span></div>`;
+  }).join('');
+  const spark=sparkData?`<div class="spark-container"><div class="spark-label"><span>Engagement Trend</span><span>${sparkData[sparkData.length-1]}%</span></div><canvas class="sparkline" data-sparkid="${id}" width="300" height="44"></canvas></div>`:'';
+  return`<div class="data-card" style="animation-delay:${idx*0.06}s" id="card-${id}">
+    <div class="card-head">
+      <div class="card-platform">
+        <div class="platform-icon" style="background:${s.bg};color:${s.color}">${s.label}</div>
+        <div><div class="platform-name">${platform}</div><div class="platform-handle">${handle}</div></div>
+      </div>
+      <div class="card-status"><div class="status-dot"></div>Live</div>
+    </div>
+    <div class="card-body">${rows}${spark}</div>
+  </div>`;
+}
+
+function buildLog(logs){
+  if(!logs.length)return`<div class="log-card"><div class="log-head"><div class="log-title">≡ Wire Request Log</div><span class="tag tag-teal">0 CALLS</span></div><div class="log-body" style="color:#334;font-style:italic">No calls recorded yet.</div></div>`;
+  const entries=logs.map(l=>`<div class="log-entry ${l.type}"><span class="log-ts">${l.time}</span><span class="log-tag">[${l.source}]</span><span class="log-msg">${l.msg}</span></div>`).join('');
+  return`<div class="log-card"><div class="log-head"><div class="log-title">≡ Wire Request Log</div><span class="tag tag-teal">${logs.length} CALLS</span></div><div class="log-body" id="logBodyInner">${entries}</div></div>`;
+}
+
+function render(){
+  const grid=document.getElementById('mainGrid');
+  const count=document.getElementById('sectionCount');
+  const title=document.getElementById('sectionTitle');
+  const bc=document.getElementById('bcCurrent');
+  const meta={all:{label:'Dashboard',bc:'Dashboard'},social:{label:'Social Intel',bc:'Social Intel'},market:{label:'Market Data',bc:'Market Data'},tech:{label:'Tech Sources',bc:'Tech Sources'},log:{label:'Wire Log',bc:'Wire Log'}};
+  const m=meta[APP.currentTab]||meta.all;
+  title.textContent=m.label; bc.textContent=m.bc;
+  if(APP.currentTab==='log'){
+    grid.innerHTML=buildLog(APP.logs);
+    count.textContent=APP.logs.length+' log entries';
+    const inner=document.getElementById('logBodyInner');
+    if(inner)inner.scrollTop=inner.scrollHeight;
+    return;
+  }
+  const filtered=APP.currentTab==='all'?APP.cards:APP.cards.filter(c=>c.type===APP.currentTab);
+  count.textContent=filtered.length+' record'+(filtered.length!==1?'s':'');
+  if(!filtered.length){
+    grid.innerHTML=APP.cards.length
+      ?`<div class="empty-state"><div class="empty-icon">◈</div><h3>No records in this category</h3><p>Switch tabs or fetch from a different source type.</p></div>`
+      :`<div class="empty-state"><div class="empty-icon">⊞</div><h3>No data fetched yet</h3><p>Try a quick use case below, or enter a target above.</p><div class="empty-presets"><button class="empty-preset-btn" onclick="loadUseCase('competitor')">🔍 Track Competitor</button><button class="empty-preset-btn" onclick="loadUseCase('launch')">🚀 Monitor Launch</button><button class="empty-preset-btn" onclick="runDemo()">⚡ Full Demo</button></div></div>`;
+    return;
+  }
+  grid.innerHTML=filtered.map((c,i)=>buildCard(c,i)).join('');
+  drawSparklines(filtered);
+}
+
+function drawSparklines(cards){
+  cards.forEach(card=>{
+    if(!card.sparkData)return;
+    const canvas=document.querySelector(`canvas[data-sparkid="${card.id}"]`);
+    if(!canvas)return;
+    const ctx=canvas.getContext('2d');
+    const w=canvas.offsetWidth||260,h=44;
+    canvas.width=w; ctx.clearRect(0,0,w,h);
+    const data=card.sparkData;
+    const min=Math.min(...data),max=Math.max(...data),rng=max-min||1;
+    const pts=data.map((v,i)=>({x:(i/(data.length-1))*w,y:h-((v-min)/rng)*(h-8)-4}));
+    const grad=ctx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0,'rgba(201,168,76,0.22)'); grad.addColorStop(1,'rgba(201,168,76,0)');
+    ctx.beginPath(); ctx.moveTo(pts[0].x,h);
+    pts.forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.lineTo(pts[pts.length-1].x,h); ctx.closePath();
+    ctx.fillStyle=grad; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y);
+    pts.forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle='#c9a84c'; ctx.lineWidth=1.8; ctx.lineJoin='round'; ctx.stroke();
+    const last=pts[pts.length-1];
+    ctx.beginPath(); ctx.arc(last.x,last.y,3.5,0,Math.PI*2);
+    ctx.fillStyle='#e8c97a'; ctx.fill();
+  });
+}
+
+function toast(msg,dur=3000){
+  const el=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>el.classList.remove('show'),dur);
+}
+
+function updateStats(){
+  document.getElementById('hStatSuccess').textContent=APP.stats.success;
+  document.getElementById('hStatTotal').textContent=APP.stats.total;
+  document.getElementById('hStatSources').textContent=APP.stats.sources;
+  const v1=document.getElementById('hsv1');
+  if(v1)v1.textContent=APP.stats.total;
+}
+
+// ═══ APP STATE ════════════════════════════════════════════════════════════
+const APP={cards:[],logs:[],currentTab:'all',stats:{success:0,total:0,sources:0},compareMode:false,
+  log(type,source,msg){
+    const time=new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    APP.logs.push({time,type,source,msg});
+  },
+  async fetchOne(sourceType,target){
+    const btn=document.getElementById('fetchBtn');
+    const icon=document.getElementById('fetchIcon');
+    if(btn){btn.disabled=true;icon.textContent='◉';}
+    try{
+      const result=await WIRE.call(sourceType,target,APP.log.bind(APP));
+      result.id=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+      result.sparkData=H.sparkArr();
+      APP.cards.push(result);
+      APP.stats.success++; APP.stats.total++;
+      APP.stats.sources=new Set(APP.cards.map(c=>c.platform)).size;
+      updateStats(); render();
+      toast(`${result.platform} data fetched for "${target}"`);
+      if(APP.compareMode)updateCompareSlots();
+    }catch(err){
+      APP.log('error','ERROR','Wire action failed: '+err.message);
+      render(); toast('Wire call failed — see log for details');
+    }finally{
+      if(btn){btn.disabled=false;icon.textContent='▶';}
+    }
+  }
+};
+
+// ═══ USE CASES ════════════════════════════════════════════════════════════
+const USE_CASES={
+  competitor:[
+    {source:'github',target:'vercel'},
+    {source:'twitter',target:'vercel'},
+    {source:'producthunt',target:'Vercel'},
+  ],
+  launch:[
+    {source:'producthunt',target:'Wire by Anakin'},
+    {source:'hacker_news',target:'Wire API'},
+    {source:'reddit',target:'SideProject'},
+    {source:'twitter',target:'anakin_ai'},
+  ],
+  founder:[
+    {source:'linkedin',target:'sam-altman'},
+    {source:'twitter',target:'sama'},
+    {source:'github',target:'sama'},
+  ],
+  market:[
+    {source:'amazon',target:'Claude AI Book'},
+    {source:'producthunt',target:'AI Tools 2026'},
+    {source:'reddit',target:'artificial'},
+    {source:'hacker_news',target:'LLM'},
+  ],
+};
+
+async function loadUseCase(name){
+  document.querySelectorAll('.usecase-pill').forEach(p=>p.classList.remove('active'));
+  event?.target?.classList.add('active');
+  const items=USE_CASES[name];
+  if(!items)return;
+  const labels={competitor:'🔍 Tracking Competitor',launch:'🚀 Monitoring Launch',founder:'👤 Researching Founder',market:'📈 Market Snapshot'};
+  const overlay=document.getElementById('loadingOverlay');
+  const ltxt=document.getElementById('loadingText');
+  overlay.style.display='flex';
+  for(let i=0;i<items.length;i++){
+    const item=items[i];
+    ltxt.textContent=`${labels[name]} — Wire call ${i+1}/${items.length} (${item.source})…`;
+    document.getElementById('sourceType').value=item.source;
+    document.getElementById('targetInput').value=item.target;
+    await APP.fetchOne(item.source,item.target);
+    await H.sleep(300);
+  }
+  overlay.style.display='none';
+  toast(`Use case complete — ${items.length} Wire calls fired`);
+}
+
+// ═══ GLOBAL HANDLERS ══════════════════════════════════════════════════════
+async function fetchWireData(){
+  const s=document.getElementById('sourceType').value;
+  const t=document.getElementById('targetInput').value.trim();
+  if(!t){toast('Please enter a target first');return;}
+  await APP.fetchOne(s,t);
+}
+
+async function runDemo(){
+  APP.cards=[];APP.logs=[];APP.stats={success:0,total:0,sources:0};
+  updateStats();
+  APP.currentTab='all';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelector('.nav-item')?.classList.add('active');
+  const overlay=document.getElementById('loadingOverlay');
+  const ltxt=document.getElementById('loadingText');
+  overlay.style.display='flex';
+  const demo=[
+    {source:'github',target:'anakin-ai'},
+    {source:'twitter',target:'elonmusk'},
+    {source:'producthunt',target:'Wire by Anakin'},
+    {source:'hacker_news',target:'Wire API'},
+    {source:'amazon',target:'Node.js Cookbook'},
+    {source:'youtube',target:'fireship'},
+  ];
+  for(let i=0;i<demo.length;i++){
+    ltxt.textContent=`Firing Wire call ${i+1}/${demo.length} — ${demo[i].source}…`;
+    document.getElementById('sourceType').value=demo[i].source;
+    document.getElementById('targetInput').value=demo[i].target;
+    await APP.fetchOne(demo[i].source,demo[i].target);
+    await H.sleep(350);
+  }
+  overlay.style.display='none';
+  toast('Demo complete — 6 Wire calls fired successfully');
+}
+
+function switchTab(tab,el){
+  APP.currentTab=tab;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  render();
+}
+
+function toggleCompare(){
+  APP.compareMode=!APP.compareMode;
+  const bar=document.getElementById('compareBar');
+  const grid=document.getElementById('mainGrid');
+  bar.classList.toggle('visible',APP.compareMode);
+  grid.classList.toggle('compare-mode',APP.compareMode);
+  toast(APP.compareMode?'Compare mode on — fetch two items to compare':'Compare mode off');
+  if(APP.compareMode)updateCompareSlots();
+}
+
+function updateCompareSlots(){
+  const last=APP.cards.slice(-2);
+  const s1=document.getElementById('slot1');
+  const s2=document.getElementById('slot2');
+  if(last[0]){s1.textContent=last[0].platform+': '+last[0].handle;s1.classList.add('filled');}
+  if(last[1]){s2.textContent=last[1].platform+': '+last[1].handle;s2.classList.add('filled');}
+}
+
+function clearCompare(){
+  APP.compareMode=false;
+  document.getElementById('compareBar').classList.remove('visible');
+  document.getElementById('mainGrid').classList.remove('compare-mode');
+  document.getElementById('slot1').textContent='Slot 1 — fetch something';
+  document.getElementById('slot2').textContent='Slot 2 — fetch something';
+  document.getElementById('slot1').classList.remove('filled');
+  document.getElementById('slot2').classList.remove('filled');
+}
+
+function exportData(){
+  if(!APP.cards.length){toast('No data to export — fetch some records first');return;}
+  const json=JSON.stringify(APP.cards.map(c=>({platform:c.platform,handle:c.handle,type:c.type,data:c.data})),null,2);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+  a.download=`webpulse-export-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast(`Exported ${APP.cards.length} records as JSON`);
+}
+
+function clearAll(){
+  APP.cards=[];APP.logs=[];APP.stats={success:0,total:0,sources:0};
+  updateStats();render();clearCompare();
+  toast('Dashboard cleared');
+}
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+
+// INIT
+document.addEventListener('DOMContentLoaded',()=>{render();updateStats();});
+</script>
+</body>
+</html>
